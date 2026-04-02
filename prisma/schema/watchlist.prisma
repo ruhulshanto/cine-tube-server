@@ -1,0 +1,17 @@
+model Watchlist {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    movieId String
+    movie   Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, movieId])
+    @@index([userId])
+    @@index([movieId])
+    @@map("watchlists")
+}

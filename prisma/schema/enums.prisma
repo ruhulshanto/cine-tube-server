@@ -1,0 +1,76 @@
+enum Role {
+    ADMIN
+    USER
+}
+
+enum UserStatus {
+    ACTIVE
+    INACTIVE
+    SUSPENDED
+}
+
+enum MediaType {
+    MOVIE
+    SERIES
+}
+
+enum PricingType {
+    FREE
+    PREMIUM
+    RENTAL
+}
+
+enum SubscriptionPlan {
+    FREE
+    MONTHLY
+    YEARLY
+}
+
+enum SubscriptionStatus {
+    ACTIVE
+    CANCELLED
+    EXPIRED
+    PAUSED
+}
+
+enum PaymentStatus {
+    PENDING
+    COMPLETED
+    FAILED
+    REFUNDED
+}
+
+enum PaymentType {
+    SUBSCRIPTION
+    PURCHASE
+    RENTAL
+}
+
+enum ReviewStatus {
+    PENDING
+    PUBLISHED
+    UNPUBLISHED
+}
+
+enum ContentType {
+    REVIEW
+    COMMENT
+}
+
+enum ReviewRating {
+    ONE
+    TWO
+    THREE
+    FOUR
+    FIVE
+    SIX
+    SEVEN
+    EIGHT
+    NINE
+    TEN
+}
+
+enum HomeSection {
+    FEATURED
+    EDITORS_PICKS
+}

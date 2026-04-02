@@ -1,0 +1,16 @@
+model HomeCuratedItem {
+  id        String      @id @default(cuid())
+  section   HomeSection
+  movieId   String
+  movie     Movie       @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  position  Int
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@unique([section, movieId])
+  @@index([section])
+  @@index([position])
+
+  @@map("home_curated_items")
+}
+

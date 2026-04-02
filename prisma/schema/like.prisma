@@ -1,0 +1,27 @@
+model Like {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+
+    // Relations (one of these will be set)
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    movieId String?
+    movie   Movie?  @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+    reviewId String?
+    review   Review? @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+    commentId String?
+    comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+    // Ensure user can only like once per entity
+    @@unique([userId, movieId], name: "unique_user_movie_like")
+    @@unique([userId, reviewId], name: "unique_user_review_like")
+    @@unique([userId, commentId], name: "unique_user_comment_like")
+    @@index([userId])
+    @@index([movieId])
+    @@index([reviewId])
+    @@index([commentId])
+    @@map("likes")
+}

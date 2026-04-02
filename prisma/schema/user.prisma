@@ -1,0 +1,30 @@
+model User {
+    id        String     @id @default(cuid())
+    email     String     @unique
+    username  String     @unique
+    password  String
+    firstName String?
+    lastName  String?
+    avatar    String?
+    profileImage String?
+    role      Role       @default(USER)
+    status    UserStatus @default(ACTIVE)
+    isDeleted Boolean    @default(false)
+    emailVerified DateTime?
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @updatedAt
+
+    // Relations
+    reviews       Review[]
+    comments      Comment[]
+    likes         Like[]
+    watchlist     Watchlist[]
+    subscriptions Subscription[]
+    payments      Payment[]
+    viewings      Viewing[]
+    refreshTokens RefreshToken[]
+    passwordResetTokens PasswordResetToken[]
+
+    @@index([email])
+    @@map("users")
+}

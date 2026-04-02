@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+    .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; }
+    .header { text-align: center; margin-bottom: 30px; }
+    .logo { font-size: 28px; font-weight: bold; color: #e50914; }
+    .button { display: inline-block; background: #e50914; color: white; padding: 12px 30px; text-decoration: none; border-radius: 4px; margin: 20px 0; }
+    .message { color: #666; line-height: 1.6; }
+    .footer { text-align: center; margin-top: 30px; color: #999; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">🎬 CineTube</div>
+    </div>
+    <h2>Welcome to CineTube!</h2>
+    <p class="message">Hi <%= firstName %>,</p>
+    <p class="message">Thank you for joining CineTube! Your account has been successfully created.</p>
+    <p class="message">Start exploring thousands of movies and TV shows today.</p>
+    <div style="text-align: center;">
+      <a href="<%= loginUrl %>" class="button">Start Watching</a>
+    </div>
+    <div class="footer">
+      <p>© <%= year %> CineTube. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>

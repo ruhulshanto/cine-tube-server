@@ -1,0 +1,40 @@
+model Movie {
+    id          String     @id @default(cuid())
+    title       String
+    slug        String     @unique
+    synopsis    String     @db.Text
+    posterUrl   String?
+    backdropUrl String?
+    trailerUrl  String?
+    streamingUrl String?
+    releaseYear Int
+    duration    Int?       // in minutes
+    mediaType   MediaType
+    pricingType PricingType @default(FREE)
+    rentalPrice Float?     // for rental pricing
+    director    String?
+    cast        String[]   // array of cast members
+    genres      String[]   // array of genres
+    tags        String[]   // array of tags
+    imdbRating  Float?
+    views       Int        @default(0)
+    averageRating Float    @default(0.0)
+    isDeleted   Boolean    @default(false)
+    deletedAt   DateTime?
+    createdAt   DateTime   @default(now())
+    updatedAt   DateTime   @updatedAt
+
+    // Relations
+    reviews   Review[]
+    likes     Like[]
+    watchlist Watchlist[]
+    viewings  Viewing[]
+    payments  Payment[]
+    homeCuratedItems HomeCuratedItem[]
+
+    @@index([slug])
+    @@index([mediaType])
+    @@index([pricingType])
+    @@index([isDeleted])
+    @@map("movies")
+}

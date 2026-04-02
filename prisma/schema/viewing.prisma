@@ -1,0 +1,19 @@
+model Viewing {
+    id        String   @id @default(cuid())
+    duration  Int      // viewing duration in seconds
+    completed Boolean  @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    movieId String
+    movie   Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@index([movieId])
+    @@index([createdAt])
+    @@map("viewings")
+}

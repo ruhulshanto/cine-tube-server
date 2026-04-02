@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+    .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; }
+    .header { text-align: center; margin-bottom: 30px; }
+    .logo { font-size: 28px; font-weight: bold; color: #e50914; }
+    .plan-badge { display: inline-block; background: #e50914; color: white; padding: 8px 20px; border-radius: 20px; font-weight: bold; margin: 10px 0; }
+    .details { background: #f9f9f9; padding: 20px; border-radius: 4px; margin: 20px 0; }
+    .button { display: inline-block; background: #e50914; color: white; padding: 12px 30px; text-decoration: none; border-radius: 4px; margin: 20px 0; }
+    .message { color: #666; line-height: 1.6; }
+    .footer { text-align: center; margin-top: 30px; color: #999; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">🎬 CineTube</div>
+    </div>
+    <h2>Subscription Confirmed!</h2>
+    <div style="text-align: center;">
+      <span class="plan-badge"><%= plan %> Plan</span>
+    </div>
+    <p class="message">Hi <%= firstName %>,</p>
+    <p class="message">Your subscription has been successfully activated! Welcome to the CineTube family.</p>
+    
+    <div class="details">
+      <p><strong>Plan:</strong> <%= plan %></p>
+      <p><strong>Start Date:</strong> <%= startDate %></p>
+      <p><strong>End Date:</strong> <%= endDate %></p>
+      <p><strong>Status:</strong> Active</p>
+    </div>
+    
+    <p class="message">You now have access to:</p>
+    <ul class="message">
+      <li>Unlimited movies and TV shows</li>
+      <li>HD streaming</li>
+      <li>Multiple device support</li>
+      <li>No ads</li>
+    </ul>
+    
+    <div style="text-align: center;">
+      <a href="<%= browseUrl %>" class="button">Browse Movies</a>
+    </div>
+    
+    <div class="footer">
+      <p>© <%= year %> CineTube. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
