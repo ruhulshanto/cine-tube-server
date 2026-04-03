@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import status from "http-status";
-import { catchAsync } from "../../share/catchAsync";
-import { sendResponse } from "../../share/sendResponse";
+import { catchAsync } from "../../shared/catchAsync";
+import { sendResponse } from "../../shared/sendResponse";
 import { MovieService } from "./movie.service";
 
 const createMovie = catchAsync(async (req: Request, res: Response) => {

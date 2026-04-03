@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import status from "http-status";
 import { AuthService } from "./auth.service";
-import { catchAsync } from "../../share/catchAsync";
-import { sendResponse } from "../../share/sendResponse";
+import { catchAsync } from "../../shared/catchAsync";
+import { sendResponse } from "../../shared/sendResponse";
 import { tokenUtils } from "../../utils/token";
 import AppError from "../../errorHelper/AppError";
 import { IRequestUser } from "../../interface/requestUser.interface";
