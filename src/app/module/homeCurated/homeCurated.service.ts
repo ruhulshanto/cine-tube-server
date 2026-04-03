@@ -11,7 +11,7 @@ const getCuratedItems = async (section: HomeSection) => {
   });
 
   // Keep only movies in the persisted order.
-  return items.map((i) => i.movie);
+  return items.map((i: any) => i.movie);
 };
 
 const upsertCuratedItems = async (section: HomeSection, movieIds: string[]) => {
@@ -26,8 +26,8 @@ const upsertCuratedItems = async (section: HomeSection, movieIds: string[]) => {
     select: { id: true },
   });
 
-  const foundIds = new Set(movies.map((m) => m.id));
-  const missing = movieIds.filter((id) => !foundIds.has(id));
+  const foundIds = new Set(movies.map((m: any) => m.id));
+  const missing = movieIds.filter((id: string) => !foundIds.has(id));
   if (missing.length) {
     throw new AppError(status.NOT_FOUND, `Some movies were not found: ${missing[0]}`);
   }
