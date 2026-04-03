@@ -32,7 +32,7 @@ const upsertCuratedItems = async (section: HomeSection, movieIds: string[]) => {
     throw new AppError(status.NOT_FOUND, `Some movies were not found: ${missing[0]}`);
   }
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: any) => {
     await tx.homeCuratedItem.deleteMany({ where: { section } });
     await tx.homeCuratedItem.createMany({
       data: movieIds.map((movieId, position) => ({

@@ -1,10 +1,10 @@
 {
   "version": 2,
+  "buildCommand": "pnpm run build:vercel",
   "installCommand": "pnpm install",
-  "buildCommand": "pnpm run build",
   "builds": [
     {
-      "src": "api/index.ts",
+      "src": "dist/index.js",
       "use": "@vercel/node",
       "config": {
         "includeFiles": ["src/**", "prisma/**", "prisma.config.ts"]
@@ -14,7 +14,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "api/index.ts"
+      "dest": "dist/index.js"
     }
   ]
 }
