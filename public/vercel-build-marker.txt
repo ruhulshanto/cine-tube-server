@@ -1,0 +1,2 @@
+This file exists so Vercel’s Output Directory "public" is not empty.
+The JSON API is served by Express (e.g. GET / and GET /health).

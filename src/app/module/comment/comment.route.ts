@@ -1,9 +1,12 @@
 import { Router } from "express";
-import { Role } from "../../../generated/prisma/enums";
+import { Role } from "@prisma/client";
 import { checkAuth } from "../../middleware/checkAuth";
 import { validateRequest } from "../../middleware/validateRequest";
 import { CommentController } from "./comment.controller";
-import { createCommentZodSchema, updateCommentZodSchema } from "./comment.validation";
+import {
+  createCommentZodSchema,
+  updateCommentZodSchema,
+} from "./comment.validation";
 
 const router = Router();
 
@@ -25,6 +28,10 @@ router.patch(
   CommentController.updateComment,
 );
 
-router.delete("/:id", checkAuth(Role.ADMIN, Role.USER), CommentController.deleteComment);
+router.delete(
+  "/:id",
+  checkAuth(Role.ADMIN, Role.USER),
+  CommentController.deleteComment,
+);
 
 export const commentRoutes: Router = router;

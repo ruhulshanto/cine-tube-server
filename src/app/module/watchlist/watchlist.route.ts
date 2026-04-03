@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { Role } from "../../../generated/prisma/enums";
+import { Role } from "@prisma/client";
 import { checkAuth } from "../../middleware/checkAuth";
 import { validateRequest } from "../../middleware/validateRequest";
 import { WatchlistController } from "./watchlist.controller";
@@ -7,7 +7,11 @@ import { addToWatchlistZodSchema } from "./watchlist.validation";
 
 const router = Router();
 
-router.get("/", checkAuth(Role.ADMIN, Role.USER), WatchlistController.getMyWatchlist);
+router.get(
+  "/",
+  checkAuth(Role.ADMIN, Role.USER),
+  WatchlistController.getMyWatchlist,
+);
 
 router.post(
   "/",
@@ -16,6 +20,10 @@ router.post(
   WatchlistController.addToWatchlist,
 );
 
-router.delete("/:movieId", checkAuth(Role.ADMIN, Role.USER), WatchlistController.removeFromWatchlist);
+router.delete(
+  "/:movieId",
+  checkAuth(Role.ADMIN, Role.USER),
+  WatchlistController.removeFromWatchlist,
+);
 
 export const watchlistRoutes: Router = router;

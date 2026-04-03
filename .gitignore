@@ -67,7 +67,7 @@ jspm_packages/
 
 # Gatsby files
 .cache/
-public
+# Keep public/ tracked: Vercel project Output Directory "public" must be non-empty.
 
 # Storybook build outputs
 .out
@@ -98,3 +98,5 @@ prisma/migrations/
 
 # Generated files
 src/generated/
+
+.vercel

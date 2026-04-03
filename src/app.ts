@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from "express";
+import express, { Application } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
@@ -16,7 +16,7 @@ const app: Application = express();
 app.post(
   "/webhook",
   express.raw({ type: "application/json" }),
-  PaymentController.handleStripeWebhookEvent,
+  PaymentController.handleStripeWebhookEvent
 );
 
 app.use(
@@ -25,8 +25,8 @@ app.use(
     credentials: true
   })
 );
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(cookieParser());
 
 app.set("view engine", "ejs");
@@ -39,9 +39,16 @@ app.set("views", path.join(__dirname, "app", "template"));
 // Health check endpoint
 app.get("/health", (req, res) => {
   res.status(200).json({
-    status: 'success',
-    message: 'CineTube API is running',
+    status: "success",
+    message: "CineTube API is running",
     timestamp: new Date().toISOString(),
+  });
+});
+
+// Welcome route for home page
+app.get("/", (req, res) => {
+  res.status(200).json({
+    message: "Welcome to CineTube API",
   });
 });
 
@@ -51,4 +58,3 @@ app.use(globalErrorHandler);
 app.use(notFound);
 
 export default app;
-

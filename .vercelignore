@@ -1,0 +1,4 @@
+# Exclude local-only files from deployment
+.env
+.env.local
+dist/
