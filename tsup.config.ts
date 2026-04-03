@@ -1,39 +1,18 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: { index: 'api/_index.ts' },
+  entry: { index: 'src/vercel.ts' },
   format: ['esm'],
   target: 'node20',
   splitting: false,
   sourcemap: false,
-  clean: false,
+  clean: true,
   minify: true,
   outDir: 'api',
   bundle: true,
-  noExternal: [
-    'express', 
-    'cors', 
-    'cookie-parser', 
-    'dotenv', 
-    'http-status', 
-    'jsonwebtoken', 
-    'bcryptjs', 
-    'ejs', 
-    'slugify', 
-    'stripe', 
-    'cloudinary', 
-    'nodemailer', 
-    'zod', 
-    'better-auth',
-    'date-fns',
-    'http-status-codes',
-    'ms',
-    'multer',
-    'multer-storage-cloudinary',
-    'node-cron',
-    'pdfkit',
-    'pg',
-    'uuid'
-  ],
-  external: ['@prisma/client'],
+  outExtension() {
+    return {
+      js: `.mjs`,
+    }
+  }
 });

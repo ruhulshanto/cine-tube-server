@@ -1,0 +1,204 @@
+﻿node : file:///C:/ProgrammingHero/NextJS/ph-healthCare/cine-tube-se
+rver/api/index.mjs:1
+At line:1 char:1
++ node api/index.mjs *>&1 | Out-File -Encoding utf8 error2.log
++ ~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (file:///C:/Prog...api 
+   /index.mjs:1:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+var xar=Object.create;var A4=Object.defineProperty;var 
+yar=Object.getOwnPropertyDescriptor;var 
+bar=Object.getOwnPropertyNames;var 
+_ar=Object.getPrototypeOf,war=Object.prototype.hasOwnProperty;var 
+W=(e=>typeof require<"u"?require:typeof Proxy<"u"?new 
+Proxy(e,{get:(r,t)=>(typeof 
+require<"u"?require:r)[t]}):e)(function(e){if(typeof 
+require<"u")return require.apply(this,arguments);throw 
+Error('Dynamic require of "'+e+'" is not supported')});var d=(e,r)=
+>()=>(r||e((r={exports:{}}).exports,r),r.exports),Wo=(e,r)=>{for(va
+r t in 
+r)A4(e,t,{get:r[t],enumerable:!0})},Ear=(e,r,t,n)=>{if(r&&typeof 
+r=="object"||typeof r=="function")for(let i of bar(r))!war.call(e,i
+)&&i!==t&&A4(e,i,{get:()=>r[i],enumerable:!(n=yar(r,i))||n.enumerab
+le});return e};var Gt=(e,r,t)=>(t=e!=null?xar(_ar(e)):{},Ear(r||!e|
+|!e.__esModule?A4(t,"default",{value:e,enumerable:!0}):t,e));var 
+aS=d((PVt,cX)=>{"use strict";var xm=1e3,ym=xm*60,bm=ym*60,Qp=bm*24,
+Sar=Qp*7,Tar=Qp*365.25;cX.exports=function(e,r){r=r||{};var 
+t=typeof e;if(t==="string"&&e.length>0)return 
+qar(e);if(t==="number"&&isFinite(e))return 
+r.long?Oar(e):Aar(e);throw new Error("val is not a non-empty 
+string or a valid number. val="+JSON.stringify(e))};function 
+qar(e){if(e=String(e),!(e.length>100)){var r=/^(-?(?:\d+)?\.?\d+) *
+(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|h
+rs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(e);if(r){var t=parse
+Float(r[1]),n=(r[2]||"ms").toLowerCase();switch(n){case"years":case
+"year":case"yrs":case"yr":case"y":return 
+t*Tar;case"weeks":case"week":case"w":return 
+t*Sar;case"days":case"day":case"d":return 
+t*Qp;case"hours":case"hour":case"hrs":case"hr":case"h":return t*bm;
+case"minutes":case"minute":case"mins":case"min":case"m":return t*ym
+;case"seconds":case"second":case"secs":case"sec":case"s":return t*x
+m;case"milliseconds":case"millisecond":case"msecs":case"msec":case"
+ms":return t;default:return}}}}function Aar(e){var 
+r=Math.abs(e);return r>=Qp?Math.round(e/Qp)+"d":r>=bm?Math.round(e/
+bm)+"h":r>=ym?Math.round(e/ym)+"m":r>=xm?Math.round(e/xm)+"s":e+"ms
+"}function Oar(e){var r=Math.abs(e);return r>=Qp?iS(e,r,Qp,"day"):r
+>=bm?iS(e,r,bm,"hour"):r>=ym?iS(e,r,ym,"minute"):r>=xm?iS(e,r,xm,"s
+econd"):e+" ms"}function iS(e,r,t,n){var i=r>=t*1.5;return 
+Math.round(e/t)+" "+n+(i?"s":"")}});var O4=d((CVt,lX)=>{"use 
+strict";function Iar(e){t.debug=t,t.default=t,t.coerce=u,t.disable=
+o,t.enable=i,t.enabled=s,t.humanize=aS(),t.destroy=l,Object.keys(e)
+.forEach(p=>{t[p]=e[p]}),t.names=[],t.skips=[],t.formatters={};func
+tion r(p){let m=0;for(let 
+v=0;v<p.length;v++)m=(m<<5)-m+p.charCodeAt(v),m|=0;return 
+t.colors[Math.abs(m)%t.colors.length]}t.selectColor=r;function 
+t(p){let m,v=null,_,w;function E(...T){if(!E.enabled)return;let 
+I=E,C=Number(new Date),j=C-(m||C);I.diff=j,I.prev=m,I.curr=C,m=C,T[
+0]=t.coerce(T[0]),typeof T[0]!="string"&&T.unshift("%O");let B=0;T[
+0]=T[0].replace(/%([a-zA-Z%])/g,(ne,ce)=>{if(ne==="%%")return"%";B+
++;let de=t.formatters[ce];if(typeof de=="function"){let 
+be=T[B];ne=de.call(I,be),T.splice(B,1),B--}return 
+ne}),t.formatArgs.call(I,T),(I.log||t.log).apply(I,T)}return E.name
+space=p,E.useColors=t.useColors(),E.color=t.selectColor(p),E.extend
+=n,E.destroy=t.destroy,Object.defineProperty(E,"enabled",{enumerabl
+e:!0,configurable:!1,get:()=>v!==null?v:(_!==t.namespaces&&(_=t.nam
+espaces,w=t.enabled(p)),w),set:T=>{v=T}}),typeof 
+t.init=="function"&&t.init(E),E}function n(p,m){let 
+v=t(this.namespace+(typeof m>"u"?":":m)+p);return 
+v.log=this.log,v}function 
+i(p){t.save(p),t.namespaces=p,t.names=[],t.skips=[];let m=(typeof p
+=="string"?p:"").trim().replace(/\s+/g,",").split(",").filter(Boole
+an);for(let v of 
+m)v[0]==="-"?t.skips.push(v.slice(1)):t.names.push(v)}function 
+a(p,m){let v=0,_=0,w=-1,E=0;for(;v<p.length;)if(_<m.length&&(m[_]==
+=p[v]||m[_]==="*"))m[_]==="*"?(w=_,E=v,_++):(v++,_++);else 
+if(w!==-1)_=w+1,E++,v=E;else 
+return!1;for(;_<m.length&&m[_]==="*";)_++;return 
+_===m.length}function o(){let 
+p=[...t.names,...t.skips.map(m=>"-"+m)].join(",");return 
+t.enable(""),p}function s(p){for(let m of 
+t.skips)if(a(p,m))return!1;for(let m of 
+t.names)if(a(p,m))return!0;return!1}function u(p){return p 
+instanceof Error?p.stack||p.message:p}function 
+l(){console.warn("Instance method `debug.destroy()` is deprecated 
+and no longer does anything. It will be removed in the next major 
+version of `debug`.")}return 
+t.enable(t.load()),t}lX.exports=Iar});var pX=d((ea,oS)=>{"use stric
+t";ea.formatArgs=Par;ea.save=Car;ea.load=kar;ea.useColors=Rar;ea.st
+orage=$ar();ea.destroy=(()=>{let 
+e=!1;return()=>{e||(e=!0,console.warn("Instance method 
+`debug.destroy()` is deprecated and no longer does anything. It 
+will be removed in the next major version of `debug`."))}})();ea.co
+lors=["#0000CC","#0000FF","#0033CC","#0033FF","#0066CC","#0066FF","
+#0099CC","#0099FF","#00CC00","#00CC33","#00CC66","#00CC99","#00CCCC
+","#00CCFF","#3300CC","#3300FF","#3333CC","#3333FF","#3366CC","#336
+6FF","#3399CC","#3399FF","#33CC00","#33CC33","#33CC66","#33CC99","#
+33CCCC","#33CCFF","#6600CC","#6600FF","#6633CC","#6633FF","#66CC00"
+,"#66CC33","#9900CC","#9900FF","#9933CC","#9933FF","#99CC00","#99CC
+33","#CC0000","#CC0033","#CC0066","#CC0099","#CC00CC","#CC00FF","#C
+C3300","#CC3333","#CC3366","#CC3399","#CC33CC","#CC33FF","#CC6600",
+"#CC6633","#CC9900","#CC9933","#CCCC00","#CCCC33","#FF0000","#FF003
+3","#FF0066","#FF0099","#FF00CC","#FF00FF","#FF3300","#FF3333","#FF
+3366","#FF3399","#FF33CC","#FF33FF","#FF6600","#FF6633","#FF9900","
+#FF9933","#FFCC00","#FFCC33"];function Rar(){if(typeof window<"u"&&
+window.process&&(window.process.type==="renderer"||window.process._
+_nwjs))return!0;if(typeof navigator<"u"&&navigator.userAgent&&navig
+ator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/))return!
+1;let e;return typeof document<"u"&&document.documentElement&&docum
+ent.documentElement.style&&document.documentElement.style.WebkitApp
+earance||typeof window<"u"&&window.console&&(window.console.firebug
+||window.console.exception&&window.console.table)||typeof navigator
+<"u"&&navigator.userAgent&&(e=navigator.userAgent.toLowerCase().mat
+ch(/firefox\/(\d+)/))&&parseInt(e[1],10)>=31||typeof navigator<"u"&
+&navigator.userAgent&&navigator.userAgent.toLowerCase().match(/appl
+ewebkit\/(\d+)/)}function Par(e){if(e[0]=(this.useColors?"%c":"")+t
+his.namespace+(this.useColors?" %c":" ")+e[0]+(this.useColors?"%c 
+":" 
+")+"+"+oS.exports.humanize(this.diff),!this.useColors)return;let 
+r="color: "+this.color;e.splice(1,0,r,"color: inherit");let t=0,n=0
+;e[0].replace(/%[a-zA-Z%]/g,i=>{i!=="%%"&&(t++,i==="%c"&&(n=t))}),e
+.splice(n,0,r)}ea.log=console.debug||console.log||(()=>{});function
+ Car(e){try{e?ea.storage.setItem("debug",e):ea.storage.removeItem("
+debug")}catch{}}function kar(){let e;try{e=ea.storage.getItem("debu
+g")||ea.storage.getItem("DEBUG")}catch{}return!e&&typeof 
+process<"u"&&"env"in process&&(e=process.env.DEBUG),e}function 
+$ar(){try{return localStorage}catch{}}oS.exports=O4()(ea);var{forma
+tters:Nar}=oS.exports;Nar.j=function(e){try{return 
+JSON.stringify(e)}catch(r){return"[UnexpectedJSONParseError]: 
+"+r.message}}});var dX=d((kVt,fX)=>{"use 
+strict";fX.exports=(e,r=process.argv)=>{let t=e.startsWith("-")?"":
+e.length===1?"-":"--",n=r.indexOf(t+e),i=r.indexOf("--");return 
+n!==-1&&(i===-1||n<i)}});var vX=d(($Vt,hX)=>{"use strict";var Dar=W
+("os"),mX=W("tty"),Ka=dX(),{env:kn}=process,il;Ka("no-color")||Ka("
+no-colors")||Ka("color=false")||Ka("color=never")?il=0:(Ka("color")
+||Ka("colors")||Ka("color=true")||Ka("color=always"))&&(il=1);"FORC
+E_COLOR"in kn&&(kn.FORCE_COLOR==="true"?il=1:kn.FORCE_COLOR==="fals
+e"?il=0:il=kn.FORCE_COLOR.length===0?1:Math.min(parseInt(kn.FORCE_C
+OLOR,10),3));function I4(e){return 
+e===0?!1:{level:e,hasBasic:!0,has256:e>=2,has16m:e>=3}}function 
+R4(e,r){if(il===0)return 0;if(Ka("color=16m")||Ka("color=full")||Ka
+("color=truecolor"))return 3;if(Ka("color=256"))return 
+2;if(e&&!r&&il===void 0)return 0;let 
+t=il||0;if(kn.TERM==="dumb")return 
+t;if(process.platform==="win32"){let 
+n=Dar.release().split(".");return Number(n[0])>=10&&Number(n[2])>=1
+0586?Number(n[2])>=14931?3:2:1}if("CI"in kn)return["TRAVIS","CIRCLE
+CI","APPVEYOR","GITLAB_CI","GITHUB_ACTIONS","BUILDKITE"].some(n=>n 
+in kn)||kn.CI_NAME==="codeship"?1:t;if("TEAMCITY_VERSION"in kn)retu
+rn/^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(kn.TEAMCITY_VERSION)?1:0;if(
+kn.COLORTERM==="truecolor")return 3;if("TERM_PROGRAM"in kn){let n=p
+arseInt((kn.TERM_PROGRAM_VERSION||"").split(".")[0],10);switch(kn.T
+ERM_PROGRAM){case"iTerm.app":return 
+n>=3?3:2;case"Apple_Terminal":return 2}}return/-256(color)?$/i.test
+(kn.TERM)?2:/^screen|^xterm|^vt100|^vt220|^rxvt|color|ansi|cygwin|l
+inux/i.test(kn.TERM)||"COLORTERM"in kn?1:t}function jar(e){let 
+r=R4(e,e&&e.isTTY);return I4(r)}hX.exports={supportsColor:jar,stdou
+t:I4(R4(!0,mX.isatty(1))),stderr:I4(R4(!0,mX.isatty(2)))}});var 
+xX=d(($n,uS)=>{"use strict";var Mar=W("tty"),sS=W("util");$n.init=G
+ar;$n.log=zar;$n.formatArgs=Uar;$n.save=Bar;$n.load=Har;$n.useColor
+s=Lar;$n.destroy=sS.deprecate(()=>{},"Instance method 
+`debug.destroy()` is deprecated and no longer does anything. It 
+will be removed in the next major version of 
+`debug`.");$n.colors=[6,2,3,4,5,1];try{let e=vX();e&&(e.stderr||e).
+level>=2&&($n.colors=[20,21,26,27,32,33,38,39,40,41,42,43,44,45,56,
+57,62,63,68,69,74,75,76,77,78,79,80,81,92,93,98,99,112,113,128,129,
+134,135,148,149,160,161,162,163,164,165,166,167,168,169,170,171,172
+,173,178,179,184,185,196,197,198,199,200,201,202,203,204,205,206,20
+7,208,209,214,215,220,221])}catch{}$n.inspectOpts=Object.keys(proce
+ss.env).filter(e=>/^debug_/i.test(e)).reduce((e,r)=>{let t=r.substr
+ing(6).toLowerCase().replace(/_([a-z])/g,(i,a)=>a.toUpperCase()),n=
+process.env[r];return/^(yes|on|true|enabled)$/i.test(n)?n=!0:/^(no|
+off|false|disabled)$/i.test(n)?n=!1:n==="null"?n=null:n=Number(n),e
+[t]=n,e},{});function Lar(){return"colors"in $n.inspectOpts?!!$n.in
+spectOpts.colors:Mar.isatty(process.stderr.fd)}function 
+Uar(e){let{namespace:r,useColors:t}=this;if(t){let 
+n=this.color,i="\x1B[3"+(n<8?n:"8;5;"+n),a=`  ${i};1m${r} 
+\x1B[0m`;e[0]=a+e[0].split(`
+                                                                   
+                                                                   
+                                                                   
+                                                                   
+                                                                   
+                                                   ^
+
+Error: Dynamic require of "events" is not supported
+    at file:///C:/ProgrammingHero/NextJS/ph-healthCare/cine-tube-se
+rver/api/index.mjs:1:387
+    at file:///C:/ProgrammingHero/NextJS/ph-healthCare/cine-tube-se
+rver/api/index.mjs:51:601
+    at file:///C:/ProgrammingHero/NextJS/ph-healthCare/cine-tube-se
+rver/api/index.mjs:1:463
+    at file:///C:/ProgrammingHero/NextJS/ph-healthCare/cine-tube-se
+rver/api/index.mjs:51:1200
+    at file:///C:/ProgrammingHero/NextJS/ph-healthCare/cine-tube-se
+rver/api/index.mjs:1:463
+    at file:///C:/ProgrammingHero/NextJS/ph-healthCare/cine-tube-se
+rver/api/index.mjs:161:31497
+    at ModuleJob.run (node:internal/modules/esm/module_job:430:25)
+    at async onImport.tracePromise.__proto__ 
+(node:internal/modules/esm/loader:661:26)
+    at async asyncRunEntryPointWithESMLoader 
+(node:internal/modules/run_main:101:5)
+
+Node.js v24.14.0
