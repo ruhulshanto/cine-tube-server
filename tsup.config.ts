@@ -6,10 +6,34 @@ export default defineConfig({
   target: 'node20',
   splitting: false,
   sourcemap: false,
-  clean: false, // Don't clean api/ because it contains index.ts
+  clean: false,
   minify: true,
   outDir: 'api',
   bundle: true,
-  noExternal: [/.*/], // Bundle all dependencies
-  external: ['@prisma/client'], // Keep Prisma client external if needed, but often bundling is better
+  noExternal: [
+    'express', 
+    'cors', 
+    'cookie-parser', 
+    'dotenv', 
+    'http-status', 
+    'jsonwebtoken', 
+    'bcryptjs', 
+    'ejs', 
+    'slugify', 
+    'stripe', 
+    'cloudinary', 
+    'nodemailer', 
+    'zod', 
+    'better-auth',
+    'date-fns',
+    'http-status-codes',
+    'ms',
+    'multer',
+    'multer-storage-cloudinary',
+    'node-cron',
+    'pdfkit',
+    'pg',
+    'uuid'
+  ],
+  external: ['@prisma/client'],
 });
