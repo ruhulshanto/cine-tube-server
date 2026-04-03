@@ -6,7 +6,7 @@ Backend API for Movie & Series Rating Portal.
 
 ## 🚀 Live API
 
-* Base URL:[ https://your-backend-url.com](https://cine-tube-server.vercel.app)
+* Base URL: https://cine-tube-server.vercel.app
 
 ---
 
@@ -47,7 +47,7 @@ Backend API for Movie & Series Rating Portal.
 ## ⚙️ Installation
 
 ```bash
-git clone [https://github.com/your-username/server-repo.git](https://github.com/ruhulshanto/cine-tube-server.git)
+git clone https://github.com/ruhulshanto/cine-tube-server.git
 cd server-repo
 pnpm install
 pnpm dev
