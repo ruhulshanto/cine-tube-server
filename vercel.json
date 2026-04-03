@@ -1,11 +1,9 @@
 {
   "version": 2,
-  "buildCommand": "pnpm run build",
-  "installCommand": "pnpm install",
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "api/index.ts"
+      "source": "/(.*)",
+      "destination": "/api"
     }
   ]
 }

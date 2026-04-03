@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node dist/server.js",
     "build": "prisma generate",
+    "build:tsup" : "tsup",
     "build:server": "prisma generate && tsup src/server.ts --format esm --platform node --target node20 --outDir api",
     "postinstall": "prisma generate",
     "dev": "tsx watch src/server.ts",
