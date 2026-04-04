@@ -10,6 +10,7 @@ export default defineConfig({
   minify: true,
   outDir: 'api',
   bundle: true,
+  external: ['@prisma/client', '@prisma/client-runtime-utils', 'prisma'],
   outExtension() {
     return {
       js: `.mjs`,
