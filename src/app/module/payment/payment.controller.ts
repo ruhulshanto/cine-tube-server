@@ -91,10 +91,36 @@ const checkMovieAccess = catchAsync(async (req: Request, res: Response) => {
 });
 
 const handleStripeWebhookEvent = catchAsync(async (req: Request, res: Response) => {
-  const signature = req.headers["stripe-signature"];
-  await PaymentService.handleStripeWebhookEvent(req.body, signature as string);
+  console.log("-----------------------------------------");
+  console.log("[Webhook] POST request received at /webhook");
+  const signature = req.headers["stripe-signature"] as string;
+  const body = req.body;
   
-  res.status(200).json({ received: true });
+  if (!signature) {
+    console.error("[Webhook Error] No stripe-signature header found");
+    return res.status(400).send("Webhook Error: Missing signature");
+  }
+
+  try {
+    await PaymentService.handleStripeWebhookEvent(body, signature);
+    console.log("[Webhook Success] Event processed successfully");
+    res.status(200).json({ received: true });
+  } catch (err: any) {
+    console.error(`[Webhook Error] ${err.message}`);
+    res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+});
+
+const verifySessionStatus = catchAsync(async (req: Request, res: Response) => {
+  const sessionId = req.params.sessionId as string;
+  const result = await PaymentService.verifySessionStatus(sessionId);
+
+  sendResponse(res, {
+    httpStatusCode: status.OK,
+    success: true,
+    message: "Session status retrieved",
+    data: result,
+  });
 });
 
 export const PaymentController = {
@@ -103,6 +129,7 @@ export const PaymentController = {
   createSubscriptionCheckoutSession,
   checkMovieAccess,
   handleStripeWebhookEvent,
+  verifySessionStatus,
   getMyPayments,
   getAllPayments,
 };

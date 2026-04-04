@@ -19,6 +19,12 @@ router.get(
   PaymentController.checkMovieAccess,
 );
 
+router.get(
+  "/verify-session/:sessionId",
+  checkAuth(Role.ADMIN, Role.USER),
+  PaymentController.verifySessionStatus,
+);
+
 router.post(
   "/movie-checkout-session",
   checkAuth(Role.ADMIN, Role.USER),

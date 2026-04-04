@@ -3,10 +3,77 @@
 // Learn more about it in docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+  provider        = "prisma-client-js"
+  binaryTargets   = ["native", "rhel-openssl-3.0.x"]
+  previewFeatures = ["prismaSchemaFolder"]
+  output          = "../../src/generated/client"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model Payment {
+    id                    String        @id @default(cuid())
+    amount                Float
+    currency              String        @default("USD")
+    status                PaymentStatus @default(PENDING)
+    paymentMethod         String        // "stripe", "paypal", etc.
+    transactionId         String?       // External transaction ID
+
+    // Stripe integration fields
+    stripePaymentIntentId String? @unique
+    stripeInvoiceId       String?
+    receiptUrl            String?
+    
+    expiresAt             DateTime?     // For tracking RENTAL expiration
+
+    description String?
+    type        PaymentType   @default(SUBSCRIPTION)
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
+
+    // Relations
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    movieId String?
+    movie   Movie?  @relation(fields: [movieId], references: [id])
+
+    subscriptionId String?
+    subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+
+    @@index([userId])
+    @@index([movieId])
+    @@index([subscriptionId])
+    @@index([status])
+    @@index([type])
+    @@index([expiresAt])
+    @@index([stripePaymentIntentId])
+    @@map("payments")
+}
+
+model Subscription {
+    id          String            @id @default(cuid())
+    plan        SubscriptionPlan  @default(FREE)
+    status      SubscriptionStatus @default(ACTIVE)
+    startDate   DateTime          @default(now())
+    endDate     DateTime?         // NULL for active or FREE plan
+    price       Float
+    stripeSubscriptionId String?
+    createdAt   DateTime          @default(now())
+    updatedAt   DateTime          @updatedAt
+
+    // Relations
+    userId String
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    payments Payment[]
+
+    @@unique([userId]) // One subscription per user at a time
+    @@index([userId])
+    @@index([status])
+    @@index([plan])
+    @@index([stripeSubscriptionId])
+    @@map("subscriptions")
 }

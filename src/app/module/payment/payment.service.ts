@@ -60,6 +60,8 @@ const getMyPayments = async (userId: string, query: Record<string, string | unde
             id: true,
             plan: true,
             status: true,
+            endDate: true,
+            startDate: true,
           },
         },
       } as any,
@@ -106,7 +108,7 @@ const createMoviePaymentSession = async (
     throw new AppError(status.BAD_REQUEST, "This movie is not available for rental");
   }
 
-  const amount = paymentType === "RENTAL" ? movie.rentalPrice! : 19.99; // Default purchase price if not specified
+  const amount = paymentType === "RENTAL" ? movie.rentalPrice! : (movie.rentalPrice || 19.99); // Use movie price if available
   const currency = "USD";
 
   if (!stripe) {
@@ -316,23 +318,107 @@ const checkMovieAccess = async (userId: string, movieId: string) => {
     return { hasAccess: true, reason: "SUBSCRIPTION" };
   }
 
-  // Step 4: Check if user has directly purchased this movie
-  const moviePurchase = await prisma.payment.findFirst({
+  // Step 4: Check if user has directly purchased or actively rented this movie
+  const movieAccess = await prisma.payment.findFirst({
     where: {
       userId,
-      // @ts-ignore
       movieId,
       status: "COMPLETED",
+      OR: [
+        { type: "PURCHASE" },
+        { 
+          type: "RENTAL",
+          expiresAt: { gt: new Date() } 
+        }
+      ]
     },
-    select: { id: true },
+    select: { id: true, type: true },
+    orderBy: { createdAt: 'desc' }
   });
 
-  if (moviePurchase) {
-    return { hasAccess: true, reason: "PURCHASED" };
+  if (movieAccess) {
+    return { hasAccess: true, reason: movieAccess.type === "RENTAL" ? "RENTAL" : "PURCHASED" };
   }
 
   // Step 5: No access
   return { hasAccess: false, reason: "PAYMENT_REQUIRED" };
+};
+
+/**
+ * Shared logic to provision access in DB after a successful Stripe payment.
+ * Used by BOTH the webhook handler and the manual verification fallback.
+ */
+const provisionAccessFromSession = async (session: any) => {
+  const metadata = session.metadata || {};
+  const { userId, movieId, plan, paymentType } = metadata;
+  const stripeId = String(session.payment_intent || session.id);
+
+  console.log(`[Provisioning] Processing ${paymentType} for User: ${userId}, Movie: ${movieId}, Session: ${session.id}`);
+
+  if (paymentType === "SUBSCRIPTION" && userId && plan) {
+    const planEnum = plan as any;
+    const endDate = new Date();
+    if (plan === "MONTHLY") endDate.setMonth(endDate.getMonth() + 1);
+    else if (plan === "YEARLY") endDate.setFullYear(endDate.getFullYear() + 1);
+
+    const paidAmount = session.amount_total != null ? session.amount_total / 100 : 0;
+    const startDate = new Date();
+
+    return await prisma.$transaction(async (tx) => {
+      const subscription = await tx.subscription.upsert({
+        where: { userId },
+        update: { plan: planEnum, status: "ACTIVE", startDate, endDate, price: paidAmount },
+        create: { userId, plan: planEnum, status: "ACTIVE", price: paidAmount, startDate, endDate },
+      });
+
+      const payment = await tx.payment.create({
+        data: {
+          userId,
+          subscriptionId: subscription.id,
+          amount: paidAmount,
+          currency: session.currency?.toUpperCase() || "USD",
+          status: "COMPLETED",
+          paymentMethod: "stripe",
+          type: "SUBSCRIPTION",
+          description: `Subscription Pass - ${plan}`,
+          stripePaymentIntentId: session.id,
+        },
+      });
+      return payment;
+    });
+
+  } else if (userId && movieId && paymentType) {
+    const existingPayment = await prisma.payment.findUnique({
+      where: { stripePaymentIntentId: stripeId },
+    });
+
+    if (!existingPayment) {
+      const movieForDesc = await prisma.movie.findUnique({
+        where: { id: movieId },
+        select: { title: true },
+      });
+
+      const expiresAt = paymentType === "RENTAL" ? new Date(Date.now() + 48 * 60 * 60 * 1000) : null;
+
+      const payment = await prisma.payment.create({
+        data: {
+          userId,
+          movieId,
+          amount: session.amount_total ? session.amount_total / 100 : 0,
+          currency: session.currency?.toUpperCase() || "USD",
+          status: "COMPLETED",
+          paymentMethod: "stripe",
+          type: paymentType as any,
+          description: `${paymentType === "RENTAL" ? "Rent" : "Buy"} Access - ${movieForDesc?.title || "Movie Access"}`,
+          stripePaymentIntentId: stripeId,
+          expiresAt,
+        },
+      });
+      return payment;
+    }
+    return existingPayment;
+  }
+  return null;
 };
 
 const handleStripeWebhookEvent = async (body: any, signature: string) => {
@@ -342,150 +428,53 @@ const handleStripeWebhookEvent = async (body: any, signature: string) => {
 
   let event;
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      envVars.STRIPE_WEBHOOK_SECRET!
-    );
+    event = stripe.webhooks.constructEvent(body, signature, envVars.STRIPE_WEBHOOK_SECRET!);
   } catch (err: any) {
     throw new AppError(status.BAD_REQUEST, `Webhook Error: ${err.message}`);
   }
 
-  console.log(`[Webhook] Event Received: ${event.type}`);
-
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as any;
-    
-    // Extracted from metadata we sent during sessions
-    const metadata = session.metadata || {};
-    const userId = metadata.userId;
-    const movieId = metadata.movieId;
-    const plan = metadata.plan;
-    const paymentType = metadata.paymentType; // PURCHASE, RENTAL, or SUBSCRIPTION
-
-    console.log(`[Webhook] Processing ${paymentType}: User: ${userId}, Movie: ${movieId}, Plan: ${plan}`);
-
-    if (paymentType === "SUBSCRIPTION" && userId && plan) {
-      // 1. Create/Update Subscription in DB
-      const endDate = new Date();
-      if (plan === "MONTHLY") endDate.setMonth(endDate.getMonth() + 1);
-      else if (plan === "YEARLY") endDate.setFullYear(endDate.getFullYear() + 1);
-
-      const paidAmount =
-        session.amount_total != null
-          ? session.amount_total / 100
-          : plan === "MONTHLY"
-            ? Number(envVars.MONTHLY_SUBSCRIPTION_PRICE) || 9.99
-            : Number(envVars.YEARLY_SUBSCRIPTION_PRICE) || 99.99;
-
-      const startDate = new Date();
-
-      // @ts-ignore
-      const subscription = await prisma.subscription.upsert({
-        where: { userId },
-        update: {
-          plan: plan,
-          status: "ACTIVE",
-          startDate,
-          endDate: endDate,
-          price: paidAmount,
-        },
-        create: {
-          userId,
-          plan: plan,
-          status: "ACTIVE",
-          price: paidAmount,
-          startDate,
-          endDate: endDate,
-        },
-      });
-
-      // 2. Create Payment Record linked to Subscription
-      await prisma.payment.create({
-        data: {
-          userId,
-          subscriptionId: subscription.id,
-          amount: session.amount_total ? session.amount_total / 100 : paidAmount,
-          currency: session.currency?.toUpperCase() || "USD",
-          status: "COMPLETED",
-          paymentMethod: "stripe",
-          type: "SUBSCRIPTION",
-          description: `Subscription Pass - ${plan}`,
-          // @ts-ignore
-          stripePaymentIntentId: session.id, // For subscriptions, session.id is usually the reference
-        },
-      });
-      console.log(`[Webhook] Subscription activated for User: ${userId}`);
-
-      const subscriber = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { email: true, firstName: true, username: true },
-      });
-      if (subscriber) {
-        await sendSubscriptionConfirmationEmail({
-          to: subscriber.email,
-          firstName: subscriber.firstName,
-          username: subscriber.username,
-          plan: String(plan),
-          startDate,
-          endDate,
-        });
-      }
-
-    } else if (userId && movieId) {
-      // Logic for MOVIE PURCHASE or RENTAL
-      const existingPayment = await prisma.payment.findFirst({
-        // @ts-ignore
-        where: { userId, movieId, status: "COMPLETED" },
-      });
-
-      if (!existingPayment) {
-        // Fetch movie title for a better description in DB
-        const movieForDesc = await prisma.movie.findUnique({
-          where: { id: movieId },
-          select: { title: true },
-        });
-
-        const newPayment = await prisma.payment.create({
-          data: {
-            userId,
-            // @ts-ignore
-            movieId,
-            amount: session.amount_total ? session.amount_total / 100 : 0,
-            currency: session.currency?.toUpperCase() || "USD",
-            status: "COMPLETED",
-            paymentMethod: "stripe",
-            type: paymentType === "RENTAL" ? "RENTAL" : "PURCHASE",
-            description: `${paymentType === "RENTAL" ? "Rent" : "Buy"} Access - ${movieForDesc?.title || "Movie Access"}`,
-            // @ts-ignore
-            stripePaymentIntentId: session.payment_intent || session.id,
-          },
-        });
-        console.log(`[Webhook] Movie ${paymentType} saved to DB: ${newPayment.id} (${movieForDesc?.title})`);
-
-        const buyer = await prisma.user.findUnique({
-          where: { id: userId },
-          select: { email: true, firstName: true, username: true },
-        });
-        if (buyer) {
-          await sendMoviePaymentConfirmationEmail({
-            to: buyer.email,
-            firstName: buyer.firstName,
-            username: buyer.username,
-            movieTitle: movieForDesc?.title || "Movie",
-            amount: newPayment.amount,
-            currency: newPayment.currency,
-            paymentTypeLabel: paymentType === "RENTAL" ? "Rental" : "Purchase",
-            transactionId: String(session.payment_intent || session.id || newPayment.id),
-          });
-        }
-      }
-    } else {
-      console.log(`[Webhook] Missing critical metadata for session ${session.id}:`, metadata);
-    }
+    await provisionAccessFromSession(session);
   }
 
   return true;
+};
+
+/**
+ * Verify if a Stripe session has been successfully processed by our webhook.
+ * Used by the frontend for instant access confirmation.
+ */
+const verifySessionStatus = async (sessionId: string) => {
+  if (!stripe) {
+    throw new AppError(status.INTERNAL_SERVER_ERROR, "Stripe is not configured");
+  }
+
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
+  const paymentIntentId = typeof session.payment_intent === "string" ? session.payment_intent : null;
+
+  const payment = await prisma.payment.findFirst({
+    where: {
+      OR: [
+        { stripePaymentIntentId: sessionId },
+        ...(paymentIntentId ? [{ stripePaymentIntentId: paymentIntentId }] : []),
+      ],
+    },
+  });
+
+  if (payment && payment.status === "COMPLETED") {
+    return { status: "COMPLETED" };
+  }
+
+  // Fallback: If Stripe says it's paid but it's not in our DB, provision it NOW.
+  // This solves issues where webhooks are blocked/delayed in dev environments.
+  if (session.payment_status === "paid" || session.status === "complete") {
+    console.log(`[Auto-Provision] Session ${sessionId} is paid. Provisioning access fallback...`);
+    await provisionAccessFromSession(session);
+    return { status: "COMPLETED" };
+  }
+
+  return { status: "PENDING" };
 };
 
 export const PaymentService = {
@@ -494,6 +483,7 @@ export const PaymentService = {
   createSubscriptionSession,
   checkMovieAccess,
   handleStripeWebhookEvent,
+  verifySessionStatus,
   getMyPayments,
   getAllPayments,
 };
