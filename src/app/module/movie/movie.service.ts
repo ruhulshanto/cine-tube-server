@@ -2,6 +2,8 @@ import status from "http-status";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../errorHelper/AppError";
 import { CreateMoviePayload, UpdateMoviePayload } from "./movie.validation";
+import { calculatePagination } from "../../shared/paginationHelper";
+import { buildMovieWhereClause } from "./movie.utils";
 
 const generateSlug = (title: string): string => {
   return title
@@ -47,57 +49,12 @@ const createMovie = async (payload: CreateMoviePayload) => {
 
 const getAllMovies = async (query: Record<string, string | undefined>) => {
   const {
-    page = "1",
-    limit = "10",
-    searchTerm,
-    genre,
-    releaseYear,
-    minRating,
-    streamingPlatform,
     sortBy = "createdAt",
     sortOrder = "desc",
   } = query;
 
-  const pageNum = parseInt(page, 10);
-  const limitNum = parseInt(limit, 10);
-  const skip = (pageNum - 1) * limitNum;
-
-  const where: Record<string, unknown> = {
-    isDeleted: false,
-  };
-
-  if (searchTerm) {
-    where.OR = [
-      { title: { contains: searchTerm, mode: "insensitive" } },
-      { synopsis: { contains: searchTerm, mode: "insensitive" } },
-      { director: { contains: searchTerm, mode: "insensitive" } },
-      { streamingUrl: { contains: searchTerm, mode: "insensitive" } },
-      { cast: { has: searchTerm } },
-    ];
-  }
-
-  if (genre) {
-    where.genres = {
-      has: genre,
-    };
-  }
-
-  if (releaseYear) {
-    where.releaseYear = parseInt(releaseYear, 10);
-  }
-
-  if (minRating) {
-    where.averageRating = {
-      gte: parseFloat(minRating),
-    };
-  }
-
-  if (streamingPlatform) {
-    where.streamingUrl = {
-      contains: streamingPlatform,
-      mode: "insensitive",
-    };
-  }
+  const { page, limit, skip } = calculatePagination(query);
+  const where = buildMovieWhereClause(query);
 
   // Handle custom sorting cases
   let orderByClause: any = {};
@@ -126,7 +83,7 @@ const getAllMovies = async (query: Record<string, string | undefined>) => {
       },
       orderBy: orderByClause,
       skip,
-      take: limitNum,
+      take: limit,
     }),
     prisma.movie.count({ where }),
   ]);
@@ -134,10 +91,10 @@ const getAllMovies = async (query: Record<string, string | undefined>) => {
   return {
     data: movies,
     meta: {
-      page: pageNum,
-      limit: limitNum,
+      page,
+      limit,
       total,
-      totalPages: Math.ceil(total / limitNum),
+      totalPages: Math.ceil(total / limit),
     },
   };
 };

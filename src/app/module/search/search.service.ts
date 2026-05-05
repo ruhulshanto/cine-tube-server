@@ -1,34 +1,28 @@
 import { prisma } from "../../lib/prisma";
+import { calculatePagination } from "../../shared/paginationHelper";
+import { buildMovieWhereClause } from "../movie/movie.utils";
 
 const searchMovies = async (query: Record<string, string | undefined>) => {
   const {
-    q,
-    genre,
-    page = "1",
-    limit = "10",
     sortBy = "createdAt",
     sortOrder = "desc",
   } = query;
 
-  const pageNum = parseInt(page, 10);
-  const limitNum = parseInt(limit, 10);
-  const skip = (pageNum - 1) * limitNum;
+  const { page, limit, skip } = calculatePagination(query);
+  const where = buildMovieWhereClause(query);
 
-  const where: Record<string, unknown> = {
-    isDeleted: false,
-  };
-
-  if (q) {
-    where.OR = [
-      { title: { contains: q, mode: "insensitive" } },
-      { synopsis: { contains: q, mode: "insensitive" } },
-    ];
-  }
-
-  if (genre) {
-    where.genres = {
-      has: genre,
-    };
+  // Handle custom sorting cases (Same logic as MovieService)
+  let orderByClause: any = {};
+  if (sortBy === "highest-rated") {
+    orderByClause = { averageRating: "desc" };
+  } else if (sortBy === "most-reviewed") {
+    orderByClause = { reviews: { _count: "desc" } };
+  } else if (sortBy === "most-liked") {
+    orderByClause = { likes: { _count: "desc" } };
+  } else if (sortBy === "latest") {
+    orderByClause = { releaseYear: "desc" };
+  } else {
+    orderByClause = { [sortBy]: sortOrder };
   }
 
   const [movies, total] = await Promise.all([
@@ -36,12 +30,15 @@ const searchMovies = async (query: Record<string, string | undefined>) => {
       where,
       include: {
         _count: {
-          select: { reviews: true, likes: true },
+          select: {
+            reviews: true,
+            likes: true,
+          },
         },
       },
-      orderBy: { [sortBy]: sortOrder },
+      orderBy: orderByClause,
       skip,
-      take: limitNum,
+      take: limit,
     }),
     prisma.movie.count({ where }),
   ]);
@@ -49,10 +46,10 @@ const searchMovies = async (query: Record<string, string | undefined>) => {
   return {
     data: movies,
     meta: {
-      page: pageNum,
-      limit: limitNum,
+      page,
+      limit,
       total,
-      totalPages: Math.ceil(total / limitNum),
+      totalPages: Math.ceil(total / limit),
     },
   };
 };
